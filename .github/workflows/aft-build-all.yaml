@@ -1,4 +1,4 @@
-name: Build PHP
+name: "AFT - Build PHP versions"
 on:
   workflow_dispatch:
     inputs:
