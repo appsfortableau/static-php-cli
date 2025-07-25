@@ -67,6 +67,7 @@ jobs:
       - id: get_php_version
         run: |
           ls -la **/*
+          chmod +x ./php-cli-8.3-linux-x86_64-glibc/php
           echo "PHP_VERSION=$(./php-cli-8.3-linux-x86_64-glibc/php -r "echo PHP_VERSION;")" >> "$GITHUB_OUTPUT"
       - name: Release
         uses: softprops/action-gh-release@v2
