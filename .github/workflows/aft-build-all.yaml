@@ -40,8 +40,8 @@ jobs:
     with:
       os: ${{ inputs.selectos }}
       php-version: ${{ inputs.php-version }}
-      extensions: ${{ env.UNIX_EXTENSIONS }}
-
+      extensions: $UNIX_EXTENSIONS
+      
   # Run UNIX build for all given versions.
   unix-all-static-builds:
     if: ${{ inputs.selectos == 'all' }}
@@ -52,7 +52,7 @@ jobs:
     with:
       os: ${{ matrix.selectos }}
       php-version: ${{ inputs.php-version }}
-      extensions: ${{ env.UNIX_EXTENSIONS }}
+      extensions: $UNIX_EXTENSIONS
 
   # Run single UNIX build
   windows-static-build:
@@ -61,7 +61,7 @@ jobs:
     with:
       os: ${{ inputs.selectos }}
       php-version: ${{ inputs.php-version }}
-      extensions: ${{ env.WINDOWS_EXTESIONS }}
+      extensions: $WINDOWS_EXTESIONS
 
   release-php-version:
     if: ${{ inputs.selectos == 'all' }}
