@@ -60,7 +60,7 @@ jobs:
     uses: appsfortableau/static-php-cli/.github/workflows/build-windows-x86_64.yml@aft-main
     with:
       os: ${{ inputs.selectos }}
-      php-version: ${{ inputs.php-version }}
+      version: ${{ inputs.php-version }}
       extensions: $WINDOWS_EXTESIONS
 
   release-php-version:
