@@ -59,7 +59,6 @@ jobs:
     if: ${{ inputs.selectos == 'windows' || inputs.selectos == 'all' }}
     uses: appsfortableau/static-php-cli/.github/workflows/build-windows-x86_64.yml@aft-main
     with:
-      os: ${{ inputs.selectos }}
       version: ${{ inputs.php-version }}
       extensions: $WINDOWS_EXTESIONS
 
