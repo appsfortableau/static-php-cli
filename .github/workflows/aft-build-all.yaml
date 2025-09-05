@@ -40,7 +40,7 @@ jobs:
     with:
       os: ${{ inputs.selectos }}
       php-version: ${{ inputs.php-version }}
-      extensions: $UNIX_EXTENSIONS
+      extensions: ${{ env.UNIX_EXTENSIONS }}
       
   # Run UNIX build for all given versions.
   unix-all-static-builds:
@@ -52,7 +52,7 @@ jobs:
     with:
       os: ${{ matrix.selectos }}
       php-version: ${{ inputs.php-version }}
-      extensions: $UNIX_EXTENSIONS
+      extensions: ${{ env.UNIX_EXTENSIONS }}
 
   # Run single UNIX build
   windows-static-build:
@@ -60,7 +60,7 @@ jobs:
     uses: appsfortableau/static-php-cli/.github/workflows/build-windows-x86_64.yml@aft-main
     with:
       version: ${{ inputs.php-version }}
-      extensions: $WINDOWS_EXTESIONS
+      extensions: ${{ env.WINDOWS_EXTESIONS }}
 
   release-php-version:
     if: ${{ inputs.selectos == 'all' }}
