@@ -15,21 +15,20 @@ on:
           # - 'linux-aarch64-glibc'
           # - 'macos-x86_64'
           - 'macos-aarch64'
-          # - 'windows'
+          - 'windows'
       php-version:
         required: true
         description: PHP version to compile
-        default: '8.3'
+        default: '8.4'
         type: choice
         options:
           - '8.4'
           - '8.3'
           # - '8.2'
           # - '8.1'
-      # create-docker:
-      #   description: 'Create a docker image'
-      #   type: boolean
-      #   default: true
+env:
+  UNIX_EXTENSIONS: 'odbc,pdo_odbc,bcmath,calendar,ctype,curl,dba,exif,fileinfo,filter,gd,libxml,mbregex,mbstring,msgpack,mysqli,mysqlnd,opcache,openssl,pcntl,pdo,pdo_mysql,pdo_pgsql,pdo_sqlite,pdo_sqlsrv,pgsql,phar,posix,readline,redis,session,simplexml,sockets,sodium,sqlite3,sqlsrv,tokenizer,xml,xmlreader,xmlwriter,zip,zlib'
+  WINDOWS_EXTENSIONS: 'odbc,pdo_odbc,bcmath,calendar,ctype,curl,dba,exif,fileinfo,filter,gd,libxml,mbregex,mbstring,msgpack,mysqli,mysqlnd,opcache,openssl,pdo,pdo_mysql,pdo_pgsql,pdo_sqlite,pdo_sqlsrv,pgsql,phar,readline,redis,session,simplexml,sockets,sodium,sqlite3,sqlsrv,tokenizer,xml,xmlreader,xmlwriter,zip,zlib'
 
 run-name: "Build '${{ inputs.selectos }}' PHP version: ${{ inputs.php-version }}"
 
@@ -41,7 +40,7 @@ jobs:
     with:
       os: ${{ inputs.selectos }}
       php-version: ${{ inputs.php-version }}
-      extensions: 'odbc,pdo_odbc,bcmath,calendar,ctype,curl,dba,exif,fileinfo,filter,gd,libxml,mbregex,mbstring,msgpack,mysqli,mysqlnd,opcache,openssl,pcntl,pdo,pdo_mysql,pdo_pgsql,pdo_sqlite,pdo_sqlsrv,pgsql,phar,posix,readline,redis,session,simplexml,sockets,sodium,sqlite3,sqlsrv,tokenizer,xml,xmlreader,xmlwriter,zip,zlib'
+      extensions: ${{ env.UNIX_EXTENSIONS }}
 
   # Run UNIX build for all given versions.
   unix-all-static-builds:
@@ -53,11 +52,20 @@ jobs:
     with:
       os: ${{ matrix.selectos }}
       php-version: ${{ inputs.php-version }}
-      extensions: 'odbc,pdo_odbc,bcmath,calendar,ctype,curl,dba,exif,fileinfo,filter,gd,libxml,mbregex,mbstring,msgpack,mysqli,mysqlnd,opcache,openssl,pcntl,pdo,pdo_mysql,pdo_pgsql,pdo_sqlite,pdo_sqlsrv,pgsql,phar,posix,readline,redis,session,simplexml,sockets,sodium,sqlite3,sqlsrv,tokenizer,xml,xmlreader,xmlwriter,zip,zlib'
+      extensions: ${{ env.UNIX_EXTENSIONS }}
+
+  # Run single UNIX build
+  windows-static-build:
+    if: ${{ inputs.selectos == 'windows' || inputs.selectos == 'all' }}
+    uses: appsfortableau/static-php-cli/.github/workflows/build-windows-x86_64.yml@main
+    with:
+      os: ${{ inputs.selectos }}
+      php-version: ${{ inputs.php-version }}
+      extensions: ${{ env.WINDOWS_EXTESIONS }}
 
   release-php-version:
     if: ${{ inputs.selectos == 'all' }}
-    needs: [unix-all-static-builds]
+    needs: [unix-all-static-builds, windows-static-build]
     name: Release PHP version ${{ inputs.php-version }}
     runs-on: ubuntu-latest
     steps:
