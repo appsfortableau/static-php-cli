@@ -26,6 +26,9 @@ on:
           - '8.3'
           # - '8.2'
           # - '8.1'
+      debug:
+        description: Show full build logs
+        type: boolean
 
 # env:
 #   UNIX_EXTENSIONS: odbc,pdo_odbc,bcmath,calendar,ctype,curl,dba,exif,fileinfo,filter,gd,libxml,mbregex,mbstring,msgpack,mysqli,mysqlnd,opcache,openssl,pcntl,pdo,pdo_mysql,pdo_pgsql,pdo_sqlite,pdo_sqlsrv,pgsql,phar,posix,readline,redis,session,simplexml,sockets,sodium,sqlite3,sqlsrv,tokenizer,xml,xmlreader,xmlwriter,zip,zlib
@@ -41,6 +44,7 @@ jobs:
     with:
       os: ${{ inputs.selectos }}
       php-version: ${{ inputs.php-version }}
+      debug: ${{ inputs.debug || runner.debug  }}
       extensions: 'odbc,pdo_odbc,bcmath,calendar,ctype,curl,dba,exif,fileinfo,filter,gd,libxml,mbregex,mbstring,msgpack,mysqli,mysqlnd,opcache,openssl,pcntl,pdo,pdo_mysql,pdo_pgsql,pdo_sqlite,pdo_sqlsrv,pgsql,phar,posix,readline,redis,session,simplexml,sockets,sodium,sqlite3,sqlsrv,tokenizer,xml,xmlreader,xmlwriter,zip,zlib'
       
   # Run UNIX build for all given versions.
@@ -53,6 +57,7 @@ jobs:
     with:
       os: ${{ matrix.selectos }}
       php-version: ${{ inputs.php-version }}
+      debug: ${{ inputs.debug || runner.debug }}
       extensions: 'odbc,pdo_odbc,bcmath,calendar,ctype,curl,dba,exif,fileinfo,filter,gd,libxml,mbregex,mbstring,msgpack,mysqli,mysqlnd,opcache,openssl,pcntl,pdo,pdo_mysql,pdo_pgsql,pdo_sqlite,pdo_sqlsrv,pgsql,phar,posix,readline,redis,session,simplexml,sockets,sodium,sqlite3,sqlsrv,tokenizer,xml,xmlreader,xmlwriter,zip,zlib'
 
   # Run single UNIX build
