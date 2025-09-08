@@ -37,7 +37,7 @@ jobs:
   # Run single UNIX build
   unix-static-build:
     if: ${{ inputs.selectos != 'windows' && inputs.selectos != 'all' }}
-    uses: appsfortableau/static-php-cli/.github/workflows/build-unix.yml@main
+    uses: ./.github/workflows/build-unix.yml@main
     with:
       os: ${{ inputs.selectos }}
       php-version: ${{ inputs.php-version }}
@@ -46,7 +46,7 @@ jobs:
   # Run UNIX build for all given versions.
   unix-all-static-builds:
     if: ${{ inputs.selectos == 'all' }}
-    uses: appsfortableau/static-php-cli/.github/workflows/build-unix.yml@main
+    uses: ./.github/workflows/build-unix.yml@main
     strategy:
       matrix:
         selectos: [linux-x86_64-glibc, macos-aarch64]
@@ -58,7 +58,7 @@ jobs:
   # Run single UNIX build
   windows-static-build:
     if: ${{ inputs.selectos == 'windows' || inputs.selectos == 'all' }}
-    uses: appsfortableau/static-php-cli/.github/workflows/build-windows-x86_64.yml@aft-main
+    uses: ./.github/workflows/build-windows-x86_64.yml@aft-main
     with:
       version: ${{ inputs.php-version }}
       extensions: 'odbc,pdo_odbc,bcmath,calendar,ctype,curl,dba,exif,fileinfo,filter,gd,libxml,mbregex,mbstring,msgpack,mysqli,mysqlnd,opcache,openssl,pdo,pdo_mysql,pdo_pgsql,pdo_sqlite,pdo_sqlsrv,pgsql,phar,readline,redis,session,simplexml,sockets,sodium,sqlite3,sqlsrv,tokenizer,xml,xmlreader,xmlwriter,zip,zlib'
