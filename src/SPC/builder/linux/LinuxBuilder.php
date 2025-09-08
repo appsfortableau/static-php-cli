@@ -84,6 +84,7 @@ class LinuxBuilder extends UnixBuilderBase
         $enableMicro = ($build_target & BUILD_TARGET_MICRO) === BUILD_TARGET_MICRO;
         $enableEmbed = ($build_target & BUILD_TARGET_EMBED) === BUILD_TARGET_EMBED;
         $enableFrankenphp = ($build_target & BUILD_TARGET_FRANKENPHP) === BUILD_TARGET_FRANKENPHP;
+        $enableCgi = ($build_target & BUILD_TARGET_CGI) === BUILD_TARGET_CGI;
 
         // prepare build php envs
         // $musl_flag = SPCTarget::getLibc() === 'musl' ? ' -D__MUSL__' : ' -U__MUSL__';
@@ -102,21 +103,21 @@ class LinuxBuilder extends UnixBuilderBase
             );
         }
 
-        shell()->cd(SOURCE_PATH . '/php-src')
-            ->exec(
-                $php_configure_env . ' ' .
+        $this->seekPhpSrcLogFileOnException(fn () => shell()->cd(SOURCE_PATH . '/php-src')->exec(
+            $php_configure_env . ' ' .
                 getenv('SPC_CMD_PREFIX_PHP_CONFIGURE') . ' ' .
                 ($enableCli ? '--enable-cli ' : '--disable-cli ') .
                 ($enableFpm ? '--enable-fpm ' . ($this->getLib('libacl') !== null ? '--with-fpm-acl ' : '') : '--disable-fpm ') .
                 ($enableEmbed ? "--enable-embed={$embed_type} " : '--disable-embed ') .
                 ($enableMicro ? '--enable-micro=all-static ' : '--disable-micro ') .
+                ($enableCgi ? '--enable-cgi ' : '--disable-cgi ') .
                 $config_file_path .
                 $config_file_scan_dir .
                 $json_74 .
                 $zts .
                 $maxExecutionTimers .
                 $this->makeStaticExtensionArgs() . ' '
-            );
+        ));
 
         $this->emitPatchPoint('before-php-make');
         SourcePatcher::patchBeforeMake($this);
@@ -130,6 +131,10 @@ class LinuxBuilder extends UnixBuilderBase
         if ($enableFpm) {
             logger()->info('building fpm');
             $this->buildFpm();
+        }
+        if ($enableCgi) {
+            logger()->info('building cgi');
+            $this->buildCgi();
         }
         if ($enableMicro) {
             logger()->info('building micro');
@@ -180,6 +185,25 @@ class LinuxBuilder extends UnixBuilderBase
         }
 
         $this->deployBinary(BUILD_TARGET_CLI);
+    }
+
+    protected function buildCgi(): void
+    {
+        $vars = SystemUtil::makeEnvVarString($this->getMakeExtraVars());
+        $SPC_CMD_PREFIX_PHP_MAKE = getenv('SPC_CMD_PREFIX_PHP_MAKE') ?: 'make';
+        shell()->cd(SOURCE_PATH . '/php-src')
+            ->exec('sed -i "s|//lib|/lib|g" Makefile')
+            ->exec("{$SPC_CMD_PREFIX_PHP_MAKE} {$vars} cgi");
+
+        if (!$this->getOption('no-strip', false)) {
+            shell()->cd(SOURCE_PATH . '/php-src/sapi/cgi')->exec('strip --strip-unneeded php-cgi');
+        }
+        if ($this->getOption('with-upx-pack')) {
+            shell()->cd(SOURCE_PATH . '/php-src/sapi/cgi')
+                ->exec(getenv('UPX_EXEC') . ' --best php-cgi');
+        }
+
+        $this->deployBinary(BUILD_TARGET_CGI);
     }
 
     /**

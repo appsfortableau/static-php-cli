@@ -100,6 +100,7 @@ class MacOSBuilder extends UnixBuilderBase
         $enableMicro = ($build_target & BUILD_TARGET_MICRO) === BUILD_TARGET_MICRO;
         $enableEmbed = ($build_target & BUILD_TARGET_EMBED) === BUILD_TARGET_EMBED;
         $enableFrankenphp = ($build_target & BUILD_TARGET_FRANKENPHP) === BUILD_TARGET_FRANKENPHP;
+        $enableCgi = ($build_target & BUILD_TARGET_CGI) === BUILD_TARGET_CGI;
 
         // prepare build php envs
         $envs_build_php = SystemUtil::makeEnvVarString([
@@ -117,20 +118,20 @@ class MacOSBuilder extends UnixBuilderBase
         }
 
         $embed_type = getenv('SPC_CMD_VAR_PHP_EMBED_TYPE') ?: 'static';
-        shell()->cd(SOURCE_PATH . '/php-src')
-            ->exec(
-                getenv('SPC_CMD_PREFIX_PHP_CONFIGURE') . ' ' .
+        $this->seekPhpSrcLogFileOnException(fn () => shell()->cd(SOURCE_PATH . '/php-src')->exec(
+            getenv('SPC_CMD_PREFIX_PHP_CONFIGURE') . ' ' .
                 ($enableCli ? '--enable-cli ' : '--disable-cli ') .
                 ($enableFpm ? '--enable-fpm ' : '--disable-fpm ') .
                 ($enableEmbed ? "--enable-embed={$embed_type} " : '--disable-embed ') .
                 ($enableMicro ? '--enable-micro ' : '--disable-micro ') .
+                ($enableCgi ? '--enable-cgi ' : '--disable-cgi ') .
                 $config_file_path .
                 $config_file_scan_dir .
                 $json_74 .
                 $zts .
                 $this->makeStaticExtensionArgs() . ' ' .
                 $envs_build_php
-            );
+        ));
 
         $this->emitPatchPoint('before-php-make');
         SourcePatcher::patchBeforeMake($this);
@@ -144,6 +145,10 @@ class MacOSBuilder extends UnixBuilderBase
         if ($enableFpm) {
             logger()->info('building fpm');
             $this->buildFpm();
+        }
+        if ($enableCgi) {
+            logger()->info('building cgi');
+            $this->buildCgi();
         }
         if ($enableMicro) {
             logger()->info('building micro');
@@ -187,6 +192,19 @@ class MacOSBuilder extends UnixBuilderBase
             $shell->exec('dsymutil -f sapi/cli/php')->exec('strip -S sapi/cli/php');
         }
         $this->deployBinary(BUILD_TARGET_CLI);
+    }
+
+    protected function buildCgi(): void
+    {
+        $vars = SystemUtil::makeEnvVarString($this->getMakeExtraVars());
+
+        $shell = shell()->cd(SOURCE_PATH . '/php-src');
+        $SPC_CMD_PREFIX_PHP_MAKE = getenv('SPC_CMD_PREFIX_PHP_MAKE') ?: 'make';
+        $shell->exec("{$SPC_CMD_PREFIX_PHP_MAKE} {$vars} cgi");
+        if (!$this->getOption('no-strip', false)) {
+            $shell->exec('dsymutil -f sapi/cgi/php-cgi')->exec('strip -S sapi/cgi/php-cgi');
+        }
+        $this->deployBinary(BUILD_TARGET_CGI);
     }
 
     /**

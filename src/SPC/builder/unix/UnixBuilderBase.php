@@ -6,12 +6,11 @@ namespace SPC\builder\unix;
 
 use SPC\builder\BuilderBase;
 use SPC\builder\linux\SystemUtil as LinuxSystemUtil;
+use SPC\exception\SPCException;
 use SPC\exception\SPCInternalException;
 use SPC\exception\ValidationException;
 use SPC\exception\WrongUsageException;
 use SPC\store\Config;
-use SPC\store\CurlHook;
-use SPC\store\Downloader;
 use SPC\store\FileSystem;
 use SPC\store\pkg\GoXcaddy;
 use SPC\toolchain\GccNativeToolchain;
@@ -122,6 +121,16 @@ abstract class UnixBuilderBase extends BuilderBase
             }
         }
 
+        // sanity check for php-cgi
+        if (($build_target & BUILD_TARGET_CGI) === BUILD_TARGET_CGI) {
+            logger()->info('running cgi sanity check');
+            [$ret, $output] = shell()->execWithResult("echo '<?php echo \"<h1>Hello, World!</h1>\";' | " . BUILD_BIN_PATH . '/php-cgi -n');
+            $raw_output = implode('', $output);
+            if ($ret !== 0 || !str_contains($raw_output, 'Hello, World!') || !str_contains($raw_output, 'text/html')) {
+                throw new ValidationException("cgi failed sanity check. code: {$ret}, output: {$raw_output}", validation_module: 'php-cgi sanity check');
+            }
+        }
+
         // sanity check for embed
         if (($build_target & BUILD_TARGET_EMBED) === BUILD_TARGET_EMBED) {
             logger()->info('running embed sanity check');
@@ -209,6 +218,7 @@ abstract class UnixBuilderBase extends BuilderBase
             BUILD_TARGET_CLI => SOURCE_PATH . '/php-src/sapi/cli/php',
             BUILD_TARGET_MICRO => SOURCE_PATH . '/php-src/sapi/micro/micro.sfx',
             BUILD_TARGET_FPM => SOURCE_PATH . '/php-src/sapi/fpm/php-fpm',
+            BUILD_TARGET_CGI => SOURCE_PATH . '/php-src/sapi/cgi/php-cgi',
             default => throw new SPCInternalException("Deployment does not accept type {$type}"),
         };
         logger()->info('Deploying ' . $this->getBuildTypeName($type) . ' file');
@@ -257,6 +267,7 @@ abstract class UnixBuilderBase extends BuilderBase
 
     protected function buildFrankenphp(): void
     {
+        GlobalEnvManager::addPathIfNotExists(GoXcaddy::getEnvironment()['PATH']);
         $nobrotli = $this->getLib('brotli') === null ? ',nobrotli' : '';
         $nowatcher = $this->getLib('watcher') === null ? ',nowatcher' : '';
         $xcaddyModules = getenv('SPC_CMD_VAR_FRANKENPHP_XCADDY_MODULES');
@@ -312,9 +323,7 @@ abstract class UnixBuilderBase extends BuilderBase
             'LD_LIBRARY_PATH' => BUILD_LIB_PATH,
         ];
         foreach (GoXcaddy::getEnvironment() as $key => $value) {
-            if ($key === 'PATH') {
-                GlobalEnvManager::addPathIfNotExists($value);
-            } else {
+            if ($key !== 'PATH') {
                 $env[$key] = $value;
             }
         }
@@ -328,6 +337,22 @@ abstract class UnixBuilderBase extends BuilderBase
             } else { // macOS doesn't understand strip-unneeded
                 shell()->cd(BUILD_BIN_PATH)->exec('strip -S frankenphp');
             }
+        }
+    }
+
+    /**
+     * Seek php-src/config.log when building PHP, add it to exception.
+     */
+    protected function seekPhpSrcLogFileOnException(callable $callback): void
+    {
+        try {
+            $callback();
+        } catch (SPCException $e) {
+            if (file_exists(SOURCE_PATH . '/php-src/config.log')) {
+                $e->addExtraLogFile('php-src config.log', 'php-src.config.log');
+                copy(SOURCE_PATH . '/php-src/config.log', SPC_LOGS_DIR . '/php-src.config.log');
+            }
+            throw $e;
         }
     }
 }
