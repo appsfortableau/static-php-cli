@@ -80,6 +80,13 @@ jobs:
           ls -la **/*
           chmod +x ./php-cli-${{ inputs.php-version }}-linux-x86_64-glibc/php
           echo "PHP_VERSION=$(./php-cli-${{ inputs.php-version }}-linux-x86_64-glibc/php -r "echo PHP_VERSION;")" >> "$GITHUB_OUTPUT"
+      - name: Recursively zip all files in each folder, naming zip after folder
+        run: |
+          find . -type d | while read dir; do
+              [ "$dir" = "." ] && continue
+              foldername=$(basename "$dir")
+              (cd "$dir" && zip -r "../${foldername}.zip" .)
+          done
       - name: Release
         uses: softprops/action-gh-release@v2
         with:
