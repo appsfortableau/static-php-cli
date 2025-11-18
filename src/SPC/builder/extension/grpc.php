@@ -43,7 +43,7 @@ class grpc extends Extension
     public function patchBeforeConfigure(): bool
     {
         $util = new SPCConfigUtil($this->builder, ['libs_only_deps' => true]);
-        $config = $util->config(['grpc']);
+        $config = $util->getExtensionConfig($this);
         $libs = $config['libs'];
         FileSystem::replaceFileStr(SOURCE_PATH . '/php-src/configure', '-lgrpc', $libs);
         return true;
@@ -55,5 +55,12 @@ class grpc extends Extension
         // add -Wno-strict-prototypes
         GlobalEnvManager::putenv('SPC_CMD_VAR_PHP_MAKE_EXTRA_CFLAGS=' . getenv('SPC_CMD_VAR_PHP_MAKE_EXTRA_CFLAGS') . ' -Wno-strict-prototypes');
         return true;
+    }
+
+    protected function getSharedExtensionEnv(): array
+    {
+        $env = parent::getSharedExtensionEnv();
+        $env['CPPFLAGS'] = $env['CXXFLAGS'] . ' -Wno-attributes';
+        return $env;
     }
 }
