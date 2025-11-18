@@ -7,12 +7,14 @@
         "source": "php-src",
         "lib-depends": [
             "lib-base",
-            "micro"
+            "micro",
+            "frankenphp"
         ],
         "lib-depends-macos": [
             "lib-base",
             "micro",
-            "libxml2"
+            "libxml2",
+            "frankenphp"
         ],
         "lib-suggests-linux": [
             "libacl",
@@ -23,6 +25,10 @@
             "brotli",
             "watcher"
         ]
+    },
+    "frankenphp": {
+        "source": "frankenphp",
+        "type": "target"
     },
     "micro": {
         "type": "target",
@@ -202,7 +208,7 @@
             "openssl",
             "libcares"
         ],
-        "provide-pre-built": true,
+        "cpp-library": true,
         "frameworks": [
             "CoreFoundation"
         ]
@@ -230,6 +236,7 @@
     },
     "imagemagick": {
         "source": "imagemagick",
+        "cpp-library": true,
         "pkg-configs": [
             "Magick++-7.Q16HDRI",
             "MagickCore-7.Q16HDRI",
@@ -342,6 +349,15 @@
             "libde265.a"
         ],
         "cpp-library": true
+    },
+    "libedit": {
+        "source": "libedit",
+        "static-libs-unix": [
+            "libedit.a"
+        ],
+        "lib-depends": [
+            "ncurses"
+        ]
     },
     "libevent": {
         "source": "libevent",
@@ -496,13 +512,16 @@
     },
     "librdkafka": {
         "source": "librdkafka",
-        "static-libs-unix": [
-            "librdkafka.a",
-            "librdkafka++.a",
-            "librdkafka-static.a"
+        "pkg-configs": [
+            "rdkafka++-static",
+            "rdkafka-static"
         ],
         "cpp-library": true,
         "lib-suggests": [
+            "curl",
+            "liblz4",
+            "openssl",
+            "zlib",
             "zstd"
         ]
     },
@@ -549,6 +568,21 @@
             "zstd"
         ]
     },
+    "liburing": {
+        "source": "liburing",
+        "pkg-configs": [
+            "liburing",
+            "liburing-ffi"
+        ],
+        "static-libs-linux": [
+            "liburing.a",
+            "liburing-ffi.a"
+        ],
+        "headers-linux": [
+            "liburing/",
+            "liburing.h"
+        ]
+    },
     "libuuid": {
         "source": "libuuid",
         "static-libs-unix": [
@@ -582,8 +616,8 @@
     },
     "libxml2": {
         "source": "libxml2",
-        "static-libs-unix": [
-            "libxml2.a"
+        "pkg-configs": [
+            "libxml-2.0"
         ],
         "static-libs-windows": [
             "libxml2s.lib",
@@ -670,6 +704,17 @@
         "source": "ncurses",
         "static-libs-unix": [
             "libncurses.a"
+        ]
+    },
+    "net-snmp": {
+        "source": "net-snmp",
+        "pkg-configs": [
+            "netsnmp",
+            "netsnmp-agent"
+        ],
+        "lib-depends": [
+            "openssl",
+            "zlib"
         ]
     },
     "nghttp2": {
@@ -770,7 +815,7 @@
             "libxml2",
             "openssl",
             "zlib",
-            "readline"
+            "libedit"
         ],
         "lib-suggests": [
             "icu",
@@ -822,6 +867,7 @@
     },
     "snappy": {
         "source": "snappy",
+        "cpp-library": true,
         "static-libs-unix": [
             "libsnappy.a"
         ],
@@ -867,6 +913,7 @@
     },
     "watcher": {
         "source": "watcher",
+        "cpp-library": true,
         "static-libs-unix": [
             "libwatcher-c.a"
         ],
@@ -942,5 +989,9 @@
             "liburing/",
             "liburing.h"
         ]
+    },
+    "frankenphp": {
+        "source": "frankenphp",
+        "type": "target"
     }
 }
