@@ -158,7 +158,7 @@ jobs:
               DOWN_CMD="$DOWN_CMD --prefer-pre-built"
           fi
           if [ ${{ inputs.build-cli }} == true ]; then
-              BUILD_CMD="$BUILD_CMD --build-cli"
+              BUILD_CMD="$BUILD_CMD --build-cli --with-suggested-libs"
           fi
           if [ ${{ inputs.build-micro }} == true ]; then
               BUILD_CMD="$BUILD_CMD --build-micro"
