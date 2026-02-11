@@ -6,18 +6,13 @@ namespace SPC\builder\unix\library;
 
 use SPC\util\executor\UnixAutoconfExecutor;
 
-trait gmp
+trait libunistring
 {
     protected function build(): void
     {
         UnixAutoconfExecutor::create($this)
-            ->appendEnv([
-                'CFLAGS' => '-std=c17',
-            ])
-            ->configure(
-                '--enable-fat'
-            )
+            ->configure('--disable-nls')
             ->make();
-        $this->patchPkgconfPrefix(['gmp.pc']);
+        $this->patchLaDependencyPrefix();
     }
 }

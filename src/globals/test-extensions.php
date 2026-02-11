@@ -16,22 +16,22 @@ $test_php_version = [
     // '8.1',
     // '8.2',
     // '8.3',
-    '8.4',
-    // '8.5',
+    // '8.4',
+    '8.5',
     // 'git',
 ];
 
 // test os (macos-15-intel, macos-15, ubuntu-latest, windows-latest are available)
 $test_os = [
-    'macos-15-intel', // bin/spc for x86_64
-    'macos-15', // bin/spc for arm64
-    'ubuntu-latest', // bin/spc-alpine-docker for x86_64
+    // 'macos-15-intel', // bin/spc for x86_64
+    // 'macos-15', // bin/spc for arm64
+    // 'ubuntu-latest', // bin/spc-alpine-docker for x86_64
     'ubuntu-22.04', // bin/spc-gnu-docker for x86_64
     'ubuntu-24.04', // bin/spc for x86_64
     'ubuntu-22.04-arm', // bin/spc-gnu-docker for arm64
     'ubuntu-24.04-arm', // bin/spc for arm64
     // 'windows-2022', // .\bin\spc.ps1
-    'windows-2025',
+    // 'windows-2025',
 ];
 
 // whether enable thread safe
@@ -50,19 +50,19 @@ $prefer_pre_built = false;
 
 // If you want to test your added extensions and libs, add below (comma separated, example `bcmath,openssl`).
 $extensions = match (PHP_OS_FAMILY) {
-    'Linux', 'Darwin' => 'rdkafka',
-    'Windows' => 'bcmath',
+    'Linux', 'Darwin' => 'pgsql',
+    'Windows' => 'com_dotnet',
 };
 
 // If you want to test shared extensions, add them below (comma separated, example `bcmath,openssl`).
 $shared_extensions = match (PHP_OS_FAMILY) {
-    'Linux' => 'snmp',
-    'Darwin' => 'snmp',
+    'Linux' => '',
+    'Darwin' => '',
     'Windows' => '',
 };
 
 // If you want to test lib-suggests for all extensions and libraries, set it to true.
-$with_suggested_libs = true;
+$with_suggested_libs = false;
 
 // If you want to test extra libs for extensions, add them below (comma separated, example `libwebp,libavif`). Unnecessary, when $with_suggested_libs is true.
 $with_libs = match (PHP_OS_FAMILY) {
@@ -74,7 +74,7 @@ $with_libs = match (PHP_OS_FAMILY) {
 // You can use `common`, `bulk`, `minimal` or `none`.
 // note: combination is only available for *nix platform. Windows must use `none` combination
 $base_combination = match (PHP_OS_FAMILY) {
-    'Linux', 'Darwin' => 'none',
+    'Linux', 'Darwin' => 'minimal',
     'Windows' => 'none',
 };
 

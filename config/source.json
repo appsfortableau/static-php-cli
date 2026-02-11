@@ -126,8 +126,18 @@
     },
     "ext-event": {
         "type": "url",
-        "url": "https://bitbucket.org/osmanov/pecl-event/get/3.0.8.tar.gz",
+        "url": "https://bitbucket.org/osmanov/pecl-event/get/3.1.4.tar.gz",
         "path": "php-src/ext/event",
+        "license": {
+            "type": "file",
+            "path": "LICENSE"
+        }
+    },
+    "ext-excimer": {
+        "type": "url",
+        "url": "https://pecl.php.net/get/excimer",
+        "path": "php-src/ext/excimer",
+        "filename": "excimer.tgz",
         "license": {
             "type": "file",
             "path": "LICENSE"
@@ -149,6 +159,18 @@
         "license": {
             "type": "file",
             "path": "LICENSE"
+        }
+    },
+    "ext-grpc": {
+        "type": "url",
+        "url": "https://pecl.php.net/get/grpc",
+        "path": "php-src/ext/grpc",
+        "filename": "grpc.tgz",
+        "license": {
+            "type": "file",
+            "path": [
+                "LICENSE"
+            ]
         }
     },
     "ext-imagick": {
@@ -182,6 +204,15 @@
             "path": [
                 "LICENSE"
             ]
+        }
+    },
+    "ext-maxminddb": {
+        "type": "url",
+        "url": "https://pecl.php.net/get/maxminddb",
+        "filename": "ext-maxminddb.tgz",
+        "license": {
+            "type": "file",
+            "path": "LICENSE"
         }
     },
     "ext-memcache": {
@@ -305,7 +336,6 @@
         "type": "ghtar",
         "repo": "php/frankenphp",
         "prefer-stable": true,
-        "provide-pre-built": false,
         "license": {
             "type": "file",
             "path": "LICENSE"
@@ -373,16 +403,6 @@
             "path": "LICENSE"
         }
     },
-    "frankenphp": {
-        "type": "ghtar",
-        "repo": "php/frankenphp",
-        "prefer-stable":  true,
-        "provide-pre-build": false,
-        "license": {
-            "type": "file",
-            "path": "LICENSE"
-        }
-    },
     "icu-static-win": {
         "type": "url",
         "url": "https://dl.static-php.dev/static-php-cli/deps/icu-static-windows-x64/icu-static-windows-x64.zip",
@@ -439,6 +459,16 @@
         "license": {
             "type": "file",
             "path": "COPYING"
+        }
+    },
+    "krb5": {
+        "type": "ghtagtar",
+        "repo": "krb5/krb5",
+        "match": "krb5.+-final",
+        "prefer-stable": true,
+        "license": {
+            "type": "file",
+            "path": "NOTICE"
         }
     },
     "ldap": {
@@ -599,6 +629,15 @@
             "path": "source/COPYING"
         }
     },
+    "libidn2": {
+        "type": "filelist",
+        "url": "https://ftp.gnu.org/gnu/libidn/",
+        "regex": "/href=\"(?<file>libidn2-(?<version>[^\"]+)\\.tar\\.gz)\"/",
+        "license": {
+            "type": "file",
+            "path": "COPYING.LESSERv3"
+        }
+    },
     "libjpeg": {
         "type": "ghtar",
         "repo": "libjpeg-turbo/libjpeg-turbo",
@@ -633,6 +672,16 @@
             "path": "LICENSE"
         }
     },
+    "libmaxminddb": {
+        "type": "ghrel",
+        "repo": "maxmind/libmaxminddb",
+        "match": "libmaxminddb-.+\\.tar\\.gz",
+        "prefer-stable": true,
+        "license": {
+            "type": "file",
+            "path": "LICENSE"
+        }
+    },
     "libmemcached": {
         "type": "ghtagtar",
         "repo": "awesomized/libmemcached",
@@ -643,9 +692,10 @@
         }
     },
     "libpng": {
-        "type": "git",
-        "url": "https://github.com/glennrp/libpng.git",
-        "rev": "libpng16",
+        "type": "ghtagtar",
+        "repo": "pnggroup/libpng",
+        "match": "v1\\.6\\.\\d+",
+        "query": "?per_page=150",
         "provide-pre-built": true,
         "license": {
             "type": "file",
@@ -653,9 +703,9 @@
         }
     },
     "librabbitmq": {
-        "type": "git",
-        "url": "https://github.com/alanxz/rabbitmq-c.git",
-        "rev": "master",
+        "type": "ghtar",
+        "repo": "alanxz/rabbitmq-c",
+        "prefer-stable": true,
         "license": {
             "type": "file",
             "path": "LICENSE"
@@ -672,7 +722,7 @@
     "libsodium": {
         "type": "ghrel",
         "repo": "jedisct1/libsodium",
-        "match": "libsodium-\\d+(\\.\\d+)*\\.tar\\.gz",
+        "match": "libsodium-(?!1\\.0\\.21)\\d+(\\.\\d+)*\\.tar\\.gz",
         "prefer-stable": true,
         "provide-pre-built": true,
         "license": {
@@ -700,6 +750,16 @@
             "path": "LICENSE.md"
         }
     },
+    "libunistring": {
+        "type": "filelist",
+        "url": "https://ftp.gnu.org/gnu/libunistring/",
+        "regex": "/href=\"(?<file>libunistring-(?<version>[^\"]+)\\.tar\\.gz)\"/",
+        "provide-pre-built": true,
+        "license": {
+            "type": "file",
+            "path": "COPYING.LIB"
+        }
+    },
     "liburing": {
         "type": "ghtar",
         "repo": "axboe/liburing",
@@ -713,6 +773,7 @@
         "type": "git",
         "url": "https://github.com/static-php/libuuid.git",
         "rev": "master",
+        "provide-pre-built": true,
         "license": {
             "type": "file",
             "path": "COPYING"
@@ -733,8 +794,9 @@
         ]
     },
     "libwebp": {
-        "type": "url",
-        "url": "https://github.com/webmproject/libwebp/archive/refs/tags/v1.3.2.tar.gz",
+        "type": "ghtagtar",
+        "repo": "webmproject/libwebp",
+        "match": "v1\\.\\d+\\.\\d+$",
         "provide-pre-built": true,
         "license": {
             "type": "file",
@@ -742,8 +804,10 @@
         }
     },
     "libxml2": {
-        "type": "url",
-        "url": "https://github.com/GNOME/libxml2/archive/refs/tags/v2.12.5.tar.gz",
+        "type": "ghtagtar",
+        "repo": "GNOME/libxml2",
+        "match": "v2\\.\\d+\\.\\d+$",
+        "provide-pre-built": false,
         "license": {
             "type": "file",
             "path": "Copyright"
@@ -825,6 +889,24 @@
         "url": "https://pecl.php.net/get/msgpack",
         "path": "php-src/ext/msgpack",
         "filename": "msgpack.tgz",
+        "license": {
+            "type": "file",
+            "path": "LICENSE"
+        }
+    },
+    "mysqlnd_ed25519": {
+        "type": "pie",
+        "repo": "mariadb/mysqlnd_ed25519",
+        "path": "php-src/ext/mysqlnd_ed25519",
+        "license": {
+            "type": "file",
+            "path": "LICENSE"
+        }
+    },
+    "mysqlnd_parsec": {
+        "type": "pie",
+        "repo": "mariadb/mysqlnd_parsec",
+        "path": "php-src/ext/mysqlnd_parsec",
         "license": {
             "type": "file",
             "path": "LICENSE"
@@ -920,6 +1002,15 @@
         "url": "https://pecl.php.net/get/parallel",
         "path": "php-src/ext/parallel",
         "filename": "parallel.tgz",
+        "license": {
+            "type": "file",
+            "path": "LICENSE"
+        }
+    },
+    "pcov": {
+        "type": "url",
+        "url": "https://pecl.php.net/get/pcov",
+        "filename": "pcov.tgz",
         "license": {
             "type": "file",
             "path": "LICENSE"
@@ -1122,9 +1213,8 @@
         }
     },
     "xdebug": {
-        "type": "url",
-        "url": "https://pecl.php.net/get/xdebug",
-        "filename": "xdebug.tgz",
+        "type": "pie",
+        "repo": "xdebug/xdebug",
         "license": {
             "type": "file",
             "path": "LICENSE"
