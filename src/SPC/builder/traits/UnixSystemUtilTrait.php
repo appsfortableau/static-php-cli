@@ -50,7 +50,7 @@ trait UnixSystemUtilTrait
         $defined = array_unique($defined);
         sort($defined);
         // export
-        if (SPCTarget::getTargetOS() === 'Linux') {
+        if (SPCTarget::getTargetOS() === 'Linux' && ToolchainManager::getToolchainClass() !== ZigToolchain::class) {
             file_put_contents("{$lib_file}.dynsym", "{\n" . implode("\n", array_map(fn ($x) => "  {$x};", $defined)) . "};\n");
         } else {
             file_put_contents("{$lib_file}.dynsym", implode("\n", $defined) . "\n");

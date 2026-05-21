@@ -11,6 +11,8 @@ use SPC\store\Config;
 use SPC\store\DirDiff;
 use SPC\store\FileSystem;
 use SPC\store\SourcePatcher;
+use SPC\toolchain\ToolchainManager;
+use SPC\toolchain\ZigToolchain;
 use SPC\util\GlobalEnvManager;
 use SPC\util\SPCConfigUtil;
 use SPC\util\SPCTarget;
@@ -65,7 +67,8 @@ class LinuxBuilder extends UnixBuilderBase
             // php 8.5 contains opcache extension by default,
             // if opcache_jit is enabled for 8.5 or opcache enabled,
             // we need to disable undefined behavior sanitizer.
-            f_putenv('SPC_COMPILER_EXTRA=-fno-sanitize=undefined');
+            $compiler_extra = getenv('SPC_COMPILER_EXTRA') ?: '';
+            f_putenv('SPC_COMPILER_EXTRA=' . trim($compiler_extra . ' -fno-sanitize=undefined'));
         }
 
         if ($this->getOption('enable-zts', false)) {
@@ -162,7 +165,7 @@ class LinuxBuilder extends UnixBuilderBase
                 throw new WrongUsageException(
                     "You're building against musl libc statically (the default on Linux), but you're trying to build shared extensions.\n" .
                     'Static musl libc does not implement `dlopen`, so your php binary is not able to load shared extensions.' . "\n" .
-                    'Either use SPC_LIBC=glibc to link against glibc on a glibc OS, or use SPC_TARGET="native-native-musl -dynamic" to link against musl libc dynamically using `zig cc`.'
+                    'Either use SPC_LIBC=glibc to link against glibc on a glibc OS, use SPC_TARGET="native-native-musl -dynamic" to link against musl libc dynamically using `zig cc` or use SPC_MUSL_DYNAMIC=true on alpine.'
                 );
             }
             logger()->info('Building shared extensions...');
@@ -266,6 +269,11 @@ class LinuxBuilder extends UnixBuilderBase
      */
     protected function buildEmbed(): void
     {
+        $compiler_extra = getenv('SPC_COMPILER_EXTRA') ?: '';
+        if (!str_contains($compiler_extra, '-lcompiler_rt') && ToolchainManager::getToolchainClass() === ZigToolchain::class) {
+            $compiler_extra = trim($compiler_extra . ' -lcompiler_rt');
+            GlobalEnvManager::putenv("SPC_COMPILER_EXTRA={$compiler_extra}");
+        }
         $sharedExts = array_filter($this->exts, static fn ($ext) => $ext->isBuildShared());
         $sharedExts = array_filter($sharedExts, static function ($ext) {
             return Config::getExt($ext->getName(), 'build-with-php') === true;
